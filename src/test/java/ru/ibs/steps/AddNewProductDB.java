@@ -9,38 +9,73 @@ import ru.ibs.database.QueriesForTest;
 import java.sql.*;
 
 public class AddNewProductDB {
-    @И("Добавить товар в базу данных")
-    public void addNewProductTest(){
-        try (Connection conn =
-                     DriverManager.getConnection(ConnectDB.DB_URL, ConnectDB.DB_USER, ConnectDB.DB_PASSWORD)) {
-            try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.INSERT)) {
-                pstmt.setInt(1, ProductInfoQuery.PRODUCT_ID);
-                pstmt.setString(2, ProductInfoQuery.PRODUCT_NAME);
-                pstmt.setString(3, ProductInfoQuery.PRODUCT_TYPE);
-                pstmt.setInt(4, ProductInfoQuery.IS_EXOTIC);
-                Assertions.assertEquals(1, pstmt.executeUpdate(), "The number of affected rows should be 1.");
-            } catch (SQLException e) {
-                Assertions.fail("The insertion into the table did not occur: " + e.getMessage());
-            }
+    Connection conn = null;
+    @И("Подключение к базе данных h2")
+    public Connection connectToDatabase() {
+        try {
+            conn = DriverManager.getConnection(ConnectDB.DB_URL, ConnectDB.DB_USER, ConnectDB.DB_PASSWORD);
+        } catch (SQLException e) {
+            Assertions.fail("Ошибка соединения с базой данных:" + e.getMessage());
+        }
+        return conn;
+    }
 
-            try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.SELECT)) {
-                pstmt.setInt(1, ProductInfoQuery.PRODUCT_ID);
-                ResultSet result = pstmt.executeQuery();
-                if (result.next()) {
-                    Assertions.assertEquals(ProductInfoQuery.PRODUCT_ID, result.getInt("food_id"),
-                            "The product ID does not match the expected one.");
-                    Assertions.assertEquals(ProductInfoQuery.PRODUCT_NAME, result.getString("food_name"),
-                            "The product name does not match the expected one.");
-                    Assertions.assertEquals(ProductInfoQuery.PRODUCT_TYPE, result.getString("food_type"),
-                            "The product type does not match what is expected.");
-                    Assertions.assertEquals(ProductInfoQuery.IS_EXOTIC, result.getInt("food_exotic"),
-                            "The value of the exotic checkbox does not match the expected value.");
-                }
-            } catch (SQLException e) {
-                Assertions.fail("The SELECT operation failed: " + e.getMessage());
+    @И("Добавление товара в h2db")
+    public void addProductToDatabase() {
+        try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.INSERT)) { // Добавьте connection в скобки
+            pstmt.setString(1, ProductInfoQuery.PRODUCT_NAME);
+            pstmt.setString(2, ProductInfoQuery.PRODUCT_TYPE);
+            pstmt.setInt(3, ProductInfoQuery.IS_EXOTIC);
+            int rowsAffected = pstmt.executeUpdate();
+            Assertions.assertEquals(1, rowsAffected, "Количество затронутых строк должно быть = 1");
+        } catch (SQLException e) {
+            Assertions.fail("Вставка в таблицу не произошла: " + e.getMessage());
+        }
+    }
+
+
+
+    @И("Проверка корректного добавления товара в бд")
+    public void verifyProductInDatabase() {
+        try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.SELECT_LAST_ROW)) {
+            ResultSet result = pstmt.executeQuery();
+
+            if (result.next()) {
+                Assertions.assertEquals(ProductInfoQuery.PRODUCT_NAME, result.getString("food_name"),
+                        "Наименование продукта не соответствует ожидаемому.");
+                Assertions.assertEquals(ProductInfoQuery.PRODUCT_TYPE, result.getString("food_type"),
+                        "Тип продукта не соответствует ожидаемому.");
+                Assertions.assertEquals(ProductInfoQuery.IS_EXOTIC, result.getInt("food_exotic"),
+                        "Экзотичность продукта не соответствует ожидаемому.");
+            } else {
+                Assertions.fail("В таблице нет добавленных продуктов");
             }
         } catch (SQLException e) {
-            Assertions.fail("The connection to the database did not occur: " + e.getMessage());
+            Assertions.fail("Операция SELECT не удалась:" + e.getMessage());
+        }
+    }
+
+
+    @И("Удаление товара из БД")
+    public void deleteProductFromDatabase() {
+        try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.DELETE)) {
+            pstmt.setString(1, ProductInfoQuery.PRODUCT_NAME);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            Assertions.fail("Не удалось выполнить запрос на удаление:" + e.getMessage());
+        }
+    }
+
+    @И("Проверка удаления товара из БД")
+    public void verifyProductDeletion() {
+        try (PreparedStatement pstmt = conn.prepareStatement(QueriesForTest.SELECT)) {
+            pstmt.setString(1, ProductInfoQuery.PRODUCT_NAME);
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+                Assertions.fail("Ошибка удаления тестового значения");
+            }
+        } catch (SQLException e) {
+            Assertions.fail("Операция SELECT не удалась:" + e.getMessage());
         }
     }
 }
