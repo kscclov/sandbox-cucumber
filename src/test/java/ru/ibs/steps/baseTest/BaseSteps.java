@@ -18,27 +18,28 @@ public class BaseSteps {
     public static WebDriver driver;
     private static Properties props = new Properties();
     private static int idPreviousProduct;
+
     @BeforeAll
-    public static void setup() {
+    public static void runDriver() {
         try (FileInputStream input = new FileInputStream("test/resources/application.properties")) {
             props.load(input);
             String driverType = props.getProperty("type.driver");
             String selenoidUrl = props.getProperty("selenoid.url");
 
-            if("remote".equalsIgnoreCase(driverType)) {
+            if ("remote".equalsIgnoreCase(driverType)) {
                 initRemoteDriver(selenoidUrl);
             } else {
-
+                System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
                 driver = new ChromeDriver();
-                System.setProperty("webdriver.chromedriver.driver",
-                        "\\src\\test\\resources\\chromedriver");
                 driver.manage().window().maximize();
                 driver.get("http://149.154.71.152:8080/food");
             }
-        } catch (Exception e){
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assertions.fail("Failed to initialize the WebDriver.");
         }
     }
+
     public static void initRemoteDriver(String selenoidUrl) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setBrowserName("chrome");
@@ -50,18 +51,21 @@ public class BaseSteps {
             driver = new RemoteWebDriver(new URL(selenoidUrl), capabilities);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            Assertions.fail("Failed to initialize remote WebDriver.");
         }
     }
 
     public static WebDriver getDriver() {
+        if (driver == null) {
+            Assertions.fail("WebDriver is not initialized. Please check the setup.");
+        }
         return driver;
     }
 
     public static int findPreviousProductId() {
         try {
             Thread.sleep(500);
-            idPreviousProduct = Integer.parseInt(driver.findElement(By.xpath(
-                    "(//tr)[last()]/th")).getText());
+            idPreviousProduct = Integer.parseInt(getDriver().findElement(By.xpath("(//tr)[last()]/th")).getText());
             return idPreviousProduct;
         } catch (Exception e) {
             Assertions.fail("Invalid id value - cannot be converted to int.");
@@ -69,12 +73,10 @@ public class BaseSteps {
         }
     }
 
-    public static int getIdPreviousProduct(){
-        return idPreviousProduct;
-    }
-
     @AfterAll
     public static void endTesting() {
-        driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 }
