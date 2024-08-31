@@ -10,7 +10,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.FileInputStream;
 import java.util.*;
-import java.util.Properties;
 
 public class BaseSteps {
     private static WebDriver driver;
@@ -18,7 +17,7 @@ public class BaseSteps {
     private static int idPreviousProduct;
     @BeforeAll
     public static void setup() {
-        try (FileInputStream input = new FileInputStream("path/to/application.properties")) {
+        try (FileInputStream input = new FileInputStream("test/resources/application.properties")) {
             props.load(input);
             String driverType = props.getProperty("type.driver");
             String selenoidUrl = props.getProperty("selenoid.url");
