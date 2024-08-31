@@ -13,6 +13,8 @@ import java.time.Duration;
 
 public class AddNewProductUI {
 
+
+
     @И("Нажатие на кнопку Добавить")
     public void clickOnAddBtn() {
         WebElement bntAdd = BaseSteps.getDriver().findElement(By.xpath("//button[contains(.,'Добавить')]"));

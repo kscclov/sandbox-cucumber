@@ -18,7 +18,7 @@ public class BaseSteps {
         System.setProperty("webdriver.chromedriver.diver",
                 "src/test/resources/chromedriver");
         driver.manage().window().maximize();
-        driver.get("http://149.154.71.152:8080/food");
+        driver.get("http://localhost:8080/food");
     }
 
     public static int findPreviousProductId() {
@@ -32,6 +32,7 @@ public class BaseSteps {
             return 0;
         }
     }
+
     public static WebDriver getDriver() {
         return driver;
     }
