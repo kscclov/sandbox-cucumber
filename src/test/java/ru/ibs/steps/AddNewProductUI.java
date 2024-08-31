@@ -32,6 +32,11 @@ public class AddNewProductUI {
         }
     }
 
+    @И("Перейти на {string}")
+    public void goToPage(String String) {
+        driver.get("http://149.154.71.152:8080/food");
+    }
+
     @И("Нажатие на кнопку Добавить")
     public void clickOnAddBtn() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
