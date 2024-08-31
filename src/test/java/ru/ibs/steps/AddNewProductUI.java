@@ -1,6 +1,7 @@
 package ru.ibs.steps;
 import io.cucumber.java.ru.И;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.*;
 import org.openqa.selenium.support.ui.*;
@@ -14,6 +15,7 @@ import java.util.*;
 public class AddNewProductUI {
     public static WebDriver driver = setupRemoteDriver();
 
+    @BeforeAll
     public static RemoteWebDriver setupRemoteDriver() {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
