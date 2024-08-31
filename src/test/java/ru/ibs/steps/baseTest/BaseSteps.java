@@ -30,9 +30,7 @@ public class BaseSteps {
                 driver = new ChromeDriver();
                 System.setProperty("webdriver.chromedriver.driver",
                         "\\src\\test\\resources\\chromedriver");
-
                 driver.manage().window().maximize();
-                //driver.get("http://localhost:8080/food");
                 driver.get("http://149.154.71.152:8080/food");
             }
         } catch (Exception e){
