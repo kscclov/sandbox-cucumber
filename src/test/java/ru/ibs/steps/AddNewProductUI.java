@@ -32,7 +32,8 @@ public class AddNewProductUI {
 
     @И("Нажатие на кнопку Добавить")
     public void clickOnAddBtn() {
-        WebElement bntAdd = driver.findElement(By.xpath("//button[contains(.,'Добавить')]"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement bntAdd = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(.,'Добавить')]")));
         bntAdd.click();
     }
 
