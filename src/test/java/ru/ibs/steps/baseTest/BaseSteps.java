@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.*;
 
 public class BaseSteps {
-    public static WebDriver driver;
+    public static final WebDriver driver;
     private static Properties props = new Properties();
     private static int idPreviousProduct;
     @BeforeAll
