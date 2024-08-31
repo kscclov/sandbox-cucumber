@@ -55,17 +55,10 @@ public class BaseSteps {
         }
     }
 
-    public static WebDriver getDriver() {
-        if (driver == null) {
-            Assertions.fail("WebDriver is not initialized. Please check the setup.");
-        }
-        return driver;
-    }
-
     public static int findPreviousProductId() {
         try {
             Thread.sleep(500);
-            idPreviousProduct = Integer.parseInt(getDriver().findElement(By.xpath("(//tr)[last()]/th")).getText());
+            idPreviousProduct = Integer.parseInt(driver.findElement(By.xpath("(//tr)[last()]/th")).getText());
             return idPreviousProduct;
         } catch (Exception e) {
             Assertions.fail("Invalid id value - cannot be converted to int.");
