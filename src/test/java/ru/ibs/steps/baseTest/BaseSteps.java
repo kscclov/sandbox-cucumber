@@ -1,24 +1,35 @@
 package ru.ibs.steps.baseTest;
 
 import io.cucumber.java.AfterAll;
-import io.cucumber.java.BeforeAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import java.net.*;
+import java.util.*;
 
 public class BaseSteps {
-    private static WebDriver driver;
 
     private static int idPreviousProduct;
-    @BeforeAll
-    public static void setup() {
+    public static WebDriver driver = setupRemoteDriver();
 
-        driver = new ChromeDriver();
-        System.setProperty("webdriver.chromedriver.diver",
-                "src/test/resources/chromedriver");
-        driver.manage().window().maximize();
-        driver.get("http://localhost:8080/food");
+    @BeforeAll
+    public static RemoteWebDriver setupRemoteDriver() {
+
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        Map<String, Object> selenoidOptions = new HashMap<>();
+        selenoidOptions.put("browserName", "chrome");
+        selenoidOptions.put("browserVersion", "109.0");
+        selenoidOptions.put("enableVNC", true);
+        selenoidOptions.put("enableVideo", false);
+        capabilities.setCapability("selenoid:options", selenoidOptions);
+        try{
+            return new RemoteWebDriver(URI.create("http://149.154.71.152:4444/wd/hub").toURL(), capabilities);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static int findPreviousProductId() {
